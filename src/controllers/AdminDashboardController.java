@@ -8,7 +8,6 @@ package controllers;
  *
  * @author Pololoers
  */
-
 import utils.SessionManager;
 import views.auth.LoginView;
 import views.dashboards.AdminDashboardView;
@@ -21,6 +20,8 @@ import views.panels.students.SearchStudentPanel;
 import views.panels.enrollment.NewStudentEnrollmentPanel;
 
 import views.panels.payments.PaymentBillingPanel;
+import controllers.ReportsController;
+import views.panels.reports.ReportsView;
 
 public class AdminDashboardController {
 
@@ -64,13 +65,12 @@ public class AdminDashboardController {
                 )
         );
 
-        adminDashboardView.getBtnReports().addActionListener(e
-                -> JOptionPane.showMessageDialog(
-                        adminDashboardView,
-                        "Reports module will be added later."
-                )
-        );
-
+        adminDashboardView.getBtnReports().addActionListener(e -> {
+            ReportsView panel = new ReportsView();
+            new ReportsController(panel);
+            loadPanel(panel);
+        });
+        
         adminDashboardView.getBtnMaintenance().addActionListener(e
                 -> JOptionPane.showMessageDialog(
                         adminDashboardView,
