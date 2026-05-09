@@ -20,8 +20,8 @@ import views.panels.students.SearchStudentPanel;
 import views.panels.enrollment.NewStudentEnrollmentPanel;
 
 import views.panels.payments.PaymentBillingPanel;
-import controllers.ReportsController;
 import views.panels.reports.ReportsView;
+import views.panels.enrollment.EnrollmentMenuPanel;
 
 public class AdminDashboardController {
 
@@ -41,8 +41,11 @@ public class AdminDashboardController {
         });
 
         adminDashboardView.getBtnEnrollment().addActionListener(e -> {
-            NewStudentEnrollmentPanel panel = new NewStudentEnrollmentPanel();
-            new EnrollmentController(panel);
+            EnrollmentMenuPanel panel = new EnrollmentMenuPanel();
+            new EnrollmentMenuController(
+                    panel,
+                    adminDashboardView.getPanelMain()
+            );
             loadPanel(panel);
         });
 
@@ -70,7 +73,7 @@ public class AdminDashboardController {
             new ReportsController(panel);
             loadPanel(panel);
         });
-        
+
         adminDashboardView.getBtnMaintenance().addActionListener(e
                 -> JOptionPane.showMessageDialog(
                         adminDashboardView,

@@ -19,8 +19,8 @@ import views.panels.students.SearchStudentPanel;
 import views.panels.enrollment.NewStudentEnrollmentPanel;
 
 import views.panels.payments.PaymentBillingPanel;
-import controllers.ReportsController;
 import views.panels.reports.ReportsView;
+import views.panels.enrollment.EnrollmentMenuPanel;
 
 public class RegistrarDashboardController {
 
@@ -34,8 +34,11 @@ public class RegistrarDashboardController {
     private void attachEvents() {
 
         registrarDashboardView.getBtnEnrollment().addActionListener(e -> {
-            NewStudentEnrollmentPanel panel = new NewStudentEnrollmentPanel();
-            new EnrollmentController(panel);
+            EnrollmentMenuPanel panel = new EnrollmentMenuPanel();
+            new EnrollmentMenuController(
+                    panel,
+                    registrarDashboardView.getPanelMain()
+            );
             loadPanel(panel);
         });
 
