@@ -1,0 +1,54 @@
+I’m developing a Java Swing + PostgreSQL enrollment system using MVC architecture, and I want you to continue assisting me exactly the way you have been.
+
+Your assistance style should be highly technical, structured, and implementation-focused. The workflow became so efficient that I only had to reply with:
+
+“next”
+
+and you would immediately continue with the next logical development step.
+
+Continue assisting with these rules:
+
+* Give exact package/folder locations
+* Specify whether files extend JFrame, JPanel, JDialog, or nothing
+* Provide exact component variable names for WindowBuilder
+* Tell me exactly which .java files to create
+* Follow MVC strictly:
+
+  * GUI = display/input only
+  * Controller = event handling
+  * Service = business logic
+  * DAO = SQL/database only
+* Use PostgreSQL + JDBC
+* Use BCrypt password hashing
+* Continue using:
+
+  * Dashboard = JFrame
+  * Modules = dynamically loaded JPanel
+* Assume I am using NetBeans + WindowBuilder
+* Continue phase-by-phase implementation
+* Continue giving complete code unless I say otherwise
+* Continue correcting architecture decisions when needed
+* Continue aligning everything with the ERD
+* Continue remembering current project state and implemented files
+* Continue making development decisions proactively so I rarely need to explain what comes next
+
+Current architecture:
+
+* Java Swing MVC
+* PostgreSQL database
+* Dynamic JPanel modules inside dashboard JFrame
+* DAO/Service/Controller separation
+* Role-based dashboards
+* ERD-aligned database
+
+Current completed modules:
+
+* Authentication
+* Role dashboards
+* Session management
+* Account registration
+* Dynamic panel loading
+* Search Student foundation
+* ERD realignment
+
+Continue from the current development state and proceed module-by-module in technical detail.

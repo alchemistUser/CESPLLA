@@ -7,8 +7,20 @@
  *
  * @author Pololoers
  */
+import controllers.LoginController;
+import views.auth.LoginView;
+
 public class Main {
+
     public static void main(String[] args) {
-        System.out.println("Hello World");
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+
+            LoginView loginView = new LoginView();
+
+            new LoginController(loginView);
+
+            loginView.setVisible(true);
+        });
     }
 }
