@@ -9,7 +9,6 @@ package utils;
  * @author Pololoers
  */
 import java.time.LocalDate;
-
 import java.time.Month;
 
 public final class SchoolYearUtil {

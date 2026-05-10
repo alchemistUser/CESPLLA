@@ -24,34 +24,44 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="cmbPaymentPlan" min="-2" max="-2" attributes="0"/>
                   <Group type="102" attributes="0">
-                      <Component id="btnRecordPayment" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnGenerateSOA" min="-2" max="-2" attributes="0"/>
+                      <Component id="lblYearBalance" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" min="-2" pref="428" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="lblStudentIdValue" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Component id="txtSearchKeyword" min="-2" pref="88" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnSearch" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnRefresh" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="cmbPaymentPlan" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="btnRecordPayment" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnGenerateSOA" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="jScrollPane1" min="-2" pref="428" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="lblStudentIdValue" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="txtSearchKeyword" min="-2" pref="88" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnSearch" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnRefresh" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="lblStudentNameValue" max="32767" attributes="0"/>
+                              <Component id="lblGradeLevelValue" max="32767" attributes="0"/>
+                              <Component id="lblEnrollmentIdValue" max="32767" attributes="0"/>
+                              <Component id="lblEnrollmentStatusValue" max="32767" attributes="0"/>
+                              <Component id="lblTotalFeeValue" max="32767" attributes="0"/>
+                              <Component id="lblTotalPaidValue" max="32767" attributes="0"/>
+                              <Component id="lblBalanceValue" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="cmbSchoolYearFilter" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnFilterByYear" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="lblStudentNameValue" max="32767" attributes="0"/>
-                      <Component id="lblGradeLevelValue" max="32767" attributes="0"/>
-                      <Component id="lblEnrollmentIdValue" max="32767" attributes="0"/>
-                      <Component id="lblEnrollmentStatusValue" max="32767" attributes="0"/>
-                      <Component id="lblTotalFeeValue" max="32767" attributes="0"/>
-                      <Component id="lblTotalPaidValue" max="32767" attributes="0"/>
-                      <Component id="lblBalanceValue" max="32767" attributes="0"/>
+                      <EmptySpace pref="120" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="95" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="120" max="32767" attributes="0"/>
-              <Component id="jScrollPane2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="95" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -91,10 +101,16 @@
                           <Component id="btnRecordPayment" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnGenerateSOA" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="cmbSchoolYearFilter" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnFilterByYear" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane2" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="152" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lblYearBalance" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="128" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -221,5 +237,30 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JComboBox" name="cmbSchoolYearFilter">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="Item 1"/>
+            <StringItem index="1" value="Item 2"/>
+            <StringItem index="2" value="Item 3"/>
+            <StringItem index="3" value="Item 4"/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnFilterByYear">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Filter by Year"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblYearBalance">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Year Balance"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

@@ -44,6 +44,7 @@ public class ReEnrollmentPanel extends javax.swing.JPanel {
         cmbEnrollmentStatus = new javax.swing.JComboBox<>();
         btnSaveEnrollment = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
+        btnCheckBalance = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -69,6 +70,8 @@ public class ReEnrollmentPanel extends javax.swing.JPanel {
 
         btnBack.setText("Back");
 
+        btnCheckBalance.setText("Check Balance");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -76,6 +79,7 @@ public class ReEnrollmentPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(101, 101, 101)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnCheckBalance)
                     .addComponent(btnBack)
                     .addComponent(btnSaveEnrollment)
                     .addComponent(cmbEnrollmentStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -117,7 +121,9 @@ public class ReEnrollmentPanel extends javax.swing.JPanel {
                 .addComponent(btnSaveEnrollment)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnBack)
-                .addContainerGap(336, Short.MAX_VALUE))
+                .addGap(45, 45, 45)
+                .addComponent(btnCheckBalance)
+                .addContainerGap(268, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -164,8 +170,13 @@ public class ReEnrollmentPanel extends javax.swing.JPanel {
     public JButton getBtnBack() {
         return btnBack;
     }
+
+    public JButton getBtnCheckBalance() {
+        return btnCheckBalance;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnCheckBalance;
     private javax.swing.JButton btnSaveEnrollment;
     private javax.swing.JCheckBox chkDiagnosticPassed;
     private javax.swing.JCheckBox chkGoodMoralSubmitted;

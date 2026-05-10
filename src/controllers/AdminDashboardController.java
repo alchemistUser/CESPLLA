@@ -14,6 +14,7 @@ import views.dashboards.AdminDashboardView;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import views.maintenance.SchoolYearManagementView;
 
 import views.panels.users.AccountRegistrationPanel;
 import views.panels.students.SearchStudentPanel;
@@ -22,6 +23,7 @@ import views.panels.enrollment.NewStudentEnrollmentPanel;
 import views.panels.payments.PaymentBillingPanel;
 import views.panels.reports.ReportsView;
 import views.panels.enrollment.EnrollmentMenuPanel;
+import views.maintenance.SchoolYearManagementView;
 
 public class AdminDashboardController {
 
@@ -96,6 +98,12 @@ public class AdminDashboardController {
         );
 
         adminDashboardView.getBtnLogout().addActionListener(e -> handleLogout());
+
+        adminDashboardView.getBtnSchoolYearManagement().addActionListener(e -> {
+            SchoolYearManagementView panel = new SchoolYearManagementView();
+            new SchoolYearManagementController(panel);
+            loadPanel(panel);
+        });
     }
 
     private void handleLogout() {

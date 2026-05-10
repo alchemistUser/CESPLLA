@@ -8,17 +8,22 @@ package controllers;
  *
  * @author Pololoers
  */
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 import dao.EnrollmentDAO;
 import dao.StudentDAO;
 import models.Enrollment;
 import models.Payment;
 import models.Student;
 import services.PaymentService;
+import utils.DialogUtil;
+import utils.ValidationUtil;
 import views.dialogs.payments.PaymentFormDialog;
 import views.panels.payments.PaymentBillingPanel;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
@@ -26,7 +31,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
 import java.util.List;
 import models.BillingBreakdownItem;
 
@@ -59,89 +63,138 @@ public class PaymentController {
         view.getCmbPaymentPlan().addActionListener(e -> handlePaymentPlanChanged());
     }
 
+    // =====================================================
+    // SEARCH STUDENT BY NAME (FIXED)
+    // =====================================================
     private void handleSearchStudentBilling() {
-        String keyword = view.getSearchKeyword();
+        String keyword = view.getTxtSearchKeyword().getText().trim();
 
-        if (keyword.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Please enter a student name or ID.");
+        if (ValidationUtil.isEmpty(keyword)) {
+            DialogUtil.showWarning(view, "Please enter a student name.");
             return;
         }
 
         try {
-            List<Student> students = studentDAO.searchStudents(keyword);
+            // 1. Search by Name
+            List<Student> results = studentDAO.searchByName(keyword);
 
-            if (students.isEmpty()) {
-                JOptionPane.showMessageDialog(view, "No student found.");
-                resetDisplay();
+            if (results.isEmpty()) {
+                DialogUtil.showError(view, "No students found matching: " + keyword);
                 return;
             }
 
-            selectedStudent = students.get(0);
+            // 2. Select first result (You can expand this to show a selection dialog later)
+            selectedStudent = results.get(0);
+
+            // 3. Find current enrollment for this student
             selectedEnrollment = enrollmentDAO.findByStudentId(selectedStudent.getStudentId());
 
             if (selectedEnrollment == null) {
-                JOptionPane.showMessageDialog(view, "Student has no enrollment record.");
-                resetDisplay();
+                DialogUtil.showWarning(view, "Student found but no enrollment record exists.");
                 return;
             }
 
-            loadBillingInformation();
+            // 4. Update UI
+            updateStudentDisplay(selectedStudent, selectedEnrollment);
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    view,
-                    "Database error while searching billing record.",
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(
-                    view,
-                    ex.getMessage(),
-                    "Validation Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
+            // 5. Load Data
+            loadBillingInformation();
+            loadPaymentHistory(selectedStudent.getStudentId());
+
+        } catch (Exception ex) {
+            DialogUtil.showError(view, "Search failed: " + ex.getMessage());
         }
     }
 
-    private void loadBillingInformation() throws SQLException {
-        int studentId = selectedStudent.getStudentId();
-        String gradeLevel = String.valueOf(selectedEnrollment.getGradeLevel());
-        String paymentPlan = view.getSelectedPaymentPlan();
+    // =====================================================
+    // UPDATE DISPLAY HELPERS
+    // =====================================================
+    private void updateStudentDisplay(Student student, Enrollment enrollment) {
+        view.getLblStudentIdValue().setText(String.valueOf(student.getStudentId()));
+        view.getLblStudentNameValue().setText(buildStudentName(student));
+        view.getLblGradeLevelValue().setText(formatGradeLevel(student.getGradeLevel()));
+        view.getLblEnrollmentIdValue().setText(String.valueOf(enrollment.getEnrollmentId()));
+        view.getLblEnrollmentStatusValue().setText(resolveEnrollmentStatus(enrollment));
 
-        BigDecimal totalFee = paymentService.getTotalFee(gradeLevel, paymentPlan);
-        BigDecimal totalPaid = paymentService.getTotalPaidByStudentId(studentId);
-        BigDecimal balance = totalFee.subtract(totalPaid);
+        // Sync payment plan combo box with enrollment data
+        view.getCmbPaymentPlan().setSelectedItem(enrollment.getPaymentScheme());
+    }
 
-        view.getLblStudentIdValue().setText(String.valueOf(studentId));
-        view.getLblStudentNameValue().setText(buildStudentName(selectedStudent));
-        view.getLblGradeLevelValue().setText(formatGradeLevel(gradeLevel));
-        view.getLblEnrollmentIdValue().setText(String.valueOf(selectedEnrollment.getEnrollmentId()));
-        view.getLblEnrollmentStatusValue().setText(resolveEnrollmentStatus(selectedEnrollment));
+    // =====================================================
+    // LOAD BILLING INFO (FEES & BALANCE)
+    // =====================================================
+    private void loadBillingInformation() {
+        if (selectedStudent == null || selectedEnrollment == null) {
+            return;
+        }
 
-        view.getLblTotalFeeValue().setText(formatCurrency(totalFee));
-        view.getLblTotalPaidValue().setText(formatCurrency(totalPaid));
-        view.getLblBalanceValue().setText(formatCurrency(balance));
+        try {
+            int studentId = selectedStudent.getStudentId();
+            String gradeLevel = selectedEnrollment.getGradeLevel();
+            String paymentPlan = view.getSelectedPaymentPlan();
 
-        refreshBillingBreakdownTable(gradeLevel, paymentPlan);
-        refreshPaymentTable(studentId);
+            // Calculate Totals
+            BigDecimal totalFee = paymentService.getTotalFee(gradeLevel, paymentPlan);
+            BigDecimal totalPaid = paymentService.getTotalPaidByStudentId(studentId);
+            BigDecimal balance = totalFee.subtract(totalPaid);
 
-        view.getBtnRecordPayment().setEnabled(true);
-        view.getBtnGenerateSOA().setEnabled(true);
+            // Update Labels
+            view.getLblTotalFeeValue().setText(formatCurrency(totalFee));
+            view.getLblTotalPaidValue().setText(formatCurrency(totalPaid));
+            view.getLblBalanceValue().setText(formatCurrency(balance));
+
+            // Color code balance
+            if (balance.compareTo(BigDecimal.ZERO) > 0) {
+                view.getLblBalanceValue().setForeground(new java.awt.Color(255, 0, 0)); // Red
+            } else {
+                view.getLblBalanceValue().setForeground(new java.awt.Color(0, 128, 0)); // Green
+            }
+
+            // Update Breakdown Table
+            refreshBillingBreakdownTable(gradeLevel, paymentPlan);
+
+            // Enable Action Buttons
+            view.getBtnRecordPayment().setEnabled(true);
+            view.getBtnGenerateSOA().setEnabled(true);
+
+        } catch (Exception ex) {
+            DialogUtil.showError(view, "Failed to load billing info: " + ex.getMessage());
+        }
+    }
+
+    // =====================================================
+    // LOAD PAYMENT HISTORY (MISSING METHOD ADDED)
+    // =====================================================
+    private void loadPaymentHistory(int studentId) {
+        try {
+            List<Payment> payments = paymentService.getPaymentHistoryByStudentId(studentId);
+
+            DefaultTableModel model = (DefaultTableModel) view.getTblPayments().getModel();
+            model.setRowCount(0); // Clear existing rows
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+            for (Payment payment : payments) {
+                model.addRow(new Object[]{
+                    payment.getPaymentId(),
+                    payment.getPaymentDate() != null ? payment.getPaymentDate().format(formatter) : "N/A",
+                    formatCurrency(payment.getAmount()),
+                    payment.getPaymentMethod(),
+                    payment.getPaymentPlan(),
+                    payment.getReferenceNumber()
+                });
+            }
+        } catch (SQLException ex) {
+            DialogUtil.showError(view, "Failed to load payment history: " + ex.getMessage());
+        }
     }
 
     private void refreshBillingBreakdownTable(String gradeLevel, String paymentPlan) {
-
-        List<BillingBreakdownItem> breakdownItems
-                = paymentService.getBillingBreakdown(gradeLevel, paymentPlan);
-
-        DefaultTableModel model
-                = (DefaultTableModel) view.getTblBillingBreakdown().getModel();
-
+        List<BillingBreakdownItem> items = paymentService.getBillingBreakdown(gradeLevel, paymentPlan);
+        DefaultTableModel model = (DefaultTableModel) view.getTblBillingBreakdown().getModel();
         model.setRowCount(0);
 
-        for (BillingBreakdownItem item : breakdownItems) {
+        for (BillingBreakdownItem item : items) {
             model.addRow(new Object[]{
                 item.getDescription(),
                 formatCurrency(item.getAmount())
@@ -149,217 +202,76 @@ public class PaymentController {
         }
     }
 
-    private void refreshPaymentTable(int studentId) throws SQLException {
-        List<Payment> payments = paymentService.getPaymentHistoryByStudentId(studentId);
-
-        DefaultTableModel model = (DefaultTableModel) view.getTblPayments().getModel();
-        model.setRowCount(0);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        for (Payment payment : payments) {
-            model.addRow(new Object[]{
-                payment.getPaymentId(),
-                payment.getPaymentDate() != null ? payment.getPaymentDate().format(formatter) : "",
-                formatCurrency(payment.getAmount()),
-                payment.getPaymentMethod(),
-                payment.getPaymentPlan(),
-                payment.getReferenceNumber()
-            });
-        }
-    }
-
+    // =====================================================
+    // EVENT HANDLERS
+    // =====================================================
     private void handlePaymentPlanChanged() {
-        if (selectedStudent == null || selectedEnrollment == null) {
-            return;
-        }
-
-        try {
+        if (selectedEnrollment != null) {
             loadBillingInformation();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    view,
-                    "Database error while updating billing summary.",
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(
-                    view,
-                    ex.getMessage(),
-                    "Validation Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
         }
     }
 
     private void handleRefresh() {
-        try {
-            if (selectedStudent != null && selectedEnrollment != null) {
-                loadBillingInformation();
-            } else {
-                resetDisplay();
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    view,
-                    "Database error while refreshing payment data.",
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(
-                    view,
-                    ex.getMessage(),
-                    "Validation Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
+        if (selectedStudent != null) {
+            loadBillingInformation();
+            loadPaymentHistory(selectedStudent.getStudentId());
+        } else {
+            resetDisplay();
         }
     }
 
     private void handleRecordPayment() {
         if (selectedStudent == null || selectedEnrollment == null) {
-            JOptionPane.showMessageDialog(view, "Please search and select a student billing record first.");
+            DialogUtil.showWarning(view, "Please search and select a student first.");
             return;
         }
 
         JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(view);
         PaymentFormDialog dialog = new PaymentFormDialog(owner, true);
-
         dialog.setLocationRelativeTo(view);
 
         dialog.getBtnCancel().addActionListener(e -> dialog.dispose());
 
         dialog.getBtnSavePayment().addActionListener(e -> {
             try {
-                Payment payment = buildPayment(dialog);
+                // Use PaymentService to validate and build the payment object
+                Payment payment = paymentService.validateAndBuildPayment(
+                        dialog.getAmountText(),
+                        dialog.getSelectedPaymentMethod(),
+                        dialog.getReferenceNumber(),
+                        view.getSelectedPaymentPlan(),
+                        dialog.getPaymentDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+                        selectedStudent.getStudentId(),
+                        selectedEnrollment.getGradeLevel()
+                );
 
+                // Record Payment
                 paymentService.recordPayment(payment);
 
-                JOptionPane.showMessageDialog(dialog, "Payment recorded successfully.");
-
+                DialogUtil.showSuccess(dialog, "Payment recorded successfully.");
                 dialog.dispose();
+
+                // Refresh Data
                 loadBillingInformation();
+                loadPaymentHistory(selectedStudent.getStudentId());
 
             } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(
-                        dialog,
-                        ex.getMessage(),
-                        "Validation Error",
-                        JOptionPane.WARNING_MESSAGE
-                );
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(
-                        dialog,
-                        "Database error while recording payment.",
-                        "Database Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                DialogUtil.showWarning(dialog, ex.getMessage());
             } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(
-                        dialog,
-                        "Unexpected error occurred while recording payment.",
-                        "System Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                DialogUtil.showError(dialog, "Database error: " + ex.getMessage());
             }
         });
 
         dialog.setVisible(true);
     }
 
-    private Payment buildPayment(PaymentFormDialog dialog) {
-
-        String amountText = dialog.getAmountText();
-
-        if (amountText.isEmpty()) {
-            throw new IllegalArgumentException("Payment amount is required.");
-        }
-
-        BigDecimal amount;
-
-        try {
-            amount = new BigDecimal(amountText);
-        } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("Invalid payment amount.");
-        }
-
-        String gradeLevel = String.valueOf(selectedEnrollment.getGradeLevel());
-
-        String paymentPlan = view.getSelectedPaymentPlan();
-
-        BigDecimal remainingBalance;
-
-        try {
-            remainingBalance = paymentService.calculateBalance(
-                    selectedStudent.getStudentId(),
-                    gradeLevel,
-                    paymentPlan
-            );
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        if (amount.compareTo(remainingBalance) > 0) {
-            throw new IllegalArgumentException(
-                    "Payment exceeds remaining balance."
-            );
-        }
-
-        if (dialog.getPaymentDate() == null) {
-            throw new IllegalArgumentException("Payment date is required.");
-        }
-
-        LocalDate paymentDate = dialog.getPaymentDate()
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-
-        Payment payment = new Payment();
-
-        payment.setStudentId(selectedStudent.getStudentId());
-        payment.setAmount(amount);
-        payment.setPaymentMethod(dialog.getSelectedPaymentMethod());
-        payment.setPaymentPlan(paymentPlan);
-        payment.setReferenceNumber(resolveReferenceNumber(dialog));
-        payment.setPaymentDate(paymentDate);
-
-        return payment;
-    }
-
-    private String resolveReferenceNumber(PaymentFormDialog dialog) {
-
-        String method = dialog.getSelectedPaymentMethod();
-        String referenceNumber = dialog.getReferenceNumber();
-
-        if ("Cash".equals(method)) {
-            if (referenceNumber == null || referenceNumber.trim().isEmpty()) {
-                return "N/A";
-            }
-
-            return referenceNumber.trim();
-        }
-
-        if (referenceNumber == null || referenceNumber.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Reference number is required for " + method + " payments."
-            );
-        }
-
-        return referenceNumber.trim();
-    }
-
     private void handleGenerateSOA() {
-        if (selectedStudent == null || selectedEnrollment == null) {
-            JOptionPane.showMessageDialog(view, "Please search and select a student billing record first.");
-            return;
-        }
-
-        JOptionPane.showMessageDialog(view, "Statement of Account generation will be added in the Reports phase.");
+        javax.swing.JOptionPane.showMessageDialog(
+                view,
+                "Statement of Account generation will be added in the Reports phase.",
+                "Information",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     private void resetDisplay() {
@@ -375,60 +287,56 @@ public class PaymentController {
         view.getLblTotalFeeValue().setText("₱0.00");
         view.getLblTotalPaidValue().setText("₱0.00");
         view.getLblBalanceValue().setText("₱0.00");
+        view.getLblBalanceValue().setForeground(new java.awt.Color(255, 0, 0));
 
-        DefaultTableModel model = (DefaultTableModel) view.getTblPayments().getModel();
-        model.setRowCount(0);
-
-        DefaultTableModel breakdownModel
-                = (DefaultTableModel) view.getTblBillingBreakdown().getModel();
-
-        breakdownModel.setRowCount(0);
+        ((DefaultTableModel) view.getTblPayments().getModel()).setRowCount(0);
+        ((DefaultTableModel) view.getTblBillingBreakdown().getModel()).setRowCount(0);
 
         view.getBtnRecordPayment().setEnabled(false);
         view.getBtnGenerateSOA().setEnabled(false);
     }
 
-    private String buildStudentName(Student student) {
-        String middleName = student.getMiddleName() == null ? "" : " " + student.getMiddleName();
-        return student.getFirstName() + middleName + " " + student.getLastName();
+    // =====================================================
+    // FORMATTERS
+    // =====================================================
+    private String buildStudentName(Student s) {
+        return s.getFirstName() + " " + (s.getMiddleName() != null ? s.getMiddleName() + " " : "") + s.getLastName();
     }
 
-    private String resolveEnrollmentStatus(Enrollment enrollment) {
-        if (enrollment == null) {
+    private String resolveEnrollmentStatus(Enrollment e) {
+        if (e == null) {
             return "-";
         }
-
-        Object status = enrollment.getEnrollmentStatus();
-
-        if (status == null) {
-            return "-";
-        }
-
-        return String.valueOf(status);
+        return switch (e.getEnrollmentStatus()) {
+            case 0 ->
+                "Pending";
+            case 1 ->
+                "Enrolled";
+            case 2 ->
+                "Rejected";
+            default ->
+                "Unknown";
+        };
     }
 
-    private String formatGradeLevel(String dbValue) {
-        if (dbValue == null) {
-            return "";
-        }
-
-        switch (dbValue) {
-            case "N":
-                return "Nursery";
-            case "K1":
-                return "Junior Kindergarten";
-            case "K2":
-                return "Senior Kindergarten";
-            default:
-                return dbValue;
-        }
+    private String formatGradeLevel(String db) {
+        return switch (db != null ? db.trim() : "") {
+            case "N" ->
+                "Nursery";
+            case "K1" ->
+                "Junior Kindergarten";
+            case "K2" ->
+                "Senior Kindergarten";
+            default ->
+                db;
+        };
     }
 
     private String formatCurrency(BigDecimal amount) {
         if (amount == null) {
-            amount = BigDecimal.ZERO;
+            return "₱0.00";
         }
-
-        return "₱" + amount.setScale(2);
+        return "₱" + amount.setScale(2, java.math.RoundingMode.HALF_UP);
     }
+
 }

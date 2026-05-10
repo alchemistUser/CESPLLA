@@ -45,6 +45,7 @@ public class AdminDashboardView extends javax.swing.JFrame {
         btnHelp = new javax.swing.JButton();
         btnAbout = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
+        btnSchoolYearManagement = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("PLLA Enrollment System - Admin Dashboard");
@@ -117,6 +118,13 @@ public class AdminDashboardView extends javax.swing.JFrame {
             }
         });
 
+        btnSchoolYearManagement.setText("S.Y. Management");
+        btnSchoolYearManagement.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSchoolYearManagementActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,7 +143,8 @@ public class AdminDashboardView extends javax.swing.JFrame {
                     .addComponent(btnMaintenance, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnHelp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnAbout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSchoolYearManagement, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -170,7 +179,9 @@ public class AdminDashboardView extends javax.swing.JFrame {
                         .addComponent(btnAbout)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLogout)
-                        .addGap(0, 380, Short.MAX_VALUE)))
+                        .addGap(40, 40, 40)
+                        .addComponent(btnSchoolYearManagement)
+                        .addGap(0, 317, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -200,6 +211,10 @@ public class AdminDashboardView extends javax.swing.JFrame {
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLogoutActionPerformed
+
+    private void btnSchoolYearManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSchoolYearManagementActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSchoolYearManagementActionPerformed
 
     /**
      * @param args the command line arguments
@@ -258,6 +273,10 @@ public class AdminDashboardView extends javax.swing.JFrame {
         return btnLogout;
     }
 
+    public JButton getBtnSchoolYearManagement() {
+        return btnSchoolYearManagement;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbout;
     private javax.swing.JButton btnAccountRegistration;
@@ -268,6 +287,7 @@ public class AdminDashboardView extends javax.swing.JFrame {
     private javax.swing.JButton btnMaintenance;
     private javax.swing.JButton btnPaymentBilling;
     private javax.swing.JButton btnReports;
+    private javax.swing.JButton btnSchoolYearManagement;
     private javax.swing.JButton btnSearchStudent;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblWelcome;

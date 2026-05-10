@@ -321,9 +321,6 @@
     <Component class="javax.swing.JLabel" name="lblEnrollmentInformationTitle">
       <Properties>
         <Property name="text" type="java.lang.String" value="Enrollment Information"/>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[124, 16]"/>
-        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblEnrollmentIdValue">

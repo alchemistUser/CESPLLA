@@ -13,8 +13,12 @@ import models.Payment;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import utils.SchoolYearUtil;
 
 public class PaymentDAO {
 
@@ -119,5 +123,115 @@ public class PaymentDAO {
         }
 
         return payment;
+    }
+
+    /**
+     * Calculates the total amount paid by a student within a specific date
+     * range. Used to calculate balances for a specific School Year.
+     */
+    public BigDecimal getTotalPaidByDateRange(int studentId, LocalDate startDate, LocalDate endDate) {
+        String sql = """
+            SELECT COALESCE(SUM(amount), 0) 
+            FROM payment 
+            WHERE student_id = ? 
+            AND payment_date >= ? 
+            AND payment_date <= ?
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, studentId);
+            pstmt.setDate(2, java.sql.Date.valueOf(startDate));
+            pstmt.setDate(3, java.sql.Date.valueOf(endDate));
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO;
+    }
+    // Add this method to dao/PaymentDAO.java
+
+    public List<Payment> findPaymentsByStudentAndDateRange(int studentId, LocalDate startDate, LocalDate endDate) {
+        List<Payment> payments = new ArrayList<>();
+        String sql = """
+        SELECT payment_id, student_id, amount, payment_method, payment_plan, 
+               reference_number, payment_date
+        FROM payment
+        WHERE student_id = ? 
+        AND payment_date >= ? 
+        AND payment_date <= ?
+        ORDER BY payment_date ASC
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, studentId);
+            pstmt.setDate(2, java.sql.Date.valueOf(startDate));
+            pstmt.setDate(3, java.sql.Date.valueOf(endDate));
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Payment payment = new Payment();
+                    payment.setPaymentId(rs.getInt("payment_id"));
+                    payment.setStudentId(rs.getInt("student_id"));
+                    payment.setAmount(rs.getBigDecimal("amount"));
+                    payment.setPaymentMethod(rs.getString("payment_method"));
+                    payment.setPaymentPlan(rs.getString("payment_plan"));
+                    payment.setReferenceNumber(rs.getString("reference_number"));
+                    payment.setPaymentDate(rs.getDate("payment_date").toLocalDate());
+                    payments.add(payment);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return payments;
+    }
+
+    // Add this method to dao/PaymentDAO.java
+    /**
+     * Fetches payments for a student, grouped by inferred school year. School
+     * year is calculated from payment_date (June-March academic year).
+     */
+    public Map<String, List<Payment>> findPaymentsGroupedBySchoolYear(int studentId) {
+        Map<String, List<Payment>> grouped = new LinkedHashMap<>();
+        String sql = """
+        SELECT payment_id, student_id, amount, payment_method, 
+               payment_plan, reference_number, payment_date
+        FROM payment
+        WHERE student_id = ?
+        ORDER BY payment_date ASC
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, studentId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Payment payment = new Payment();
+                    payment.setPaymentId(rs.getInt("payment_id"));
+                    payment.setStudentId(rs.getInt("student_id"));
+                    payment.setAmount(rs.getBigDecimal("amount"));
+                    payment.setPaymentMethod(rs.getString("payment_method"));
+                    payment.setPaymentPlan(rs.getString("payment_plan"));
+                    payment.setReferenceNumber(rs.getString("reference_number"));
+                    payment.setPaymentDate(rs.getDate("payment_date").toLocalDate());
+
+                    // Infer school year from payment_date
+                    String schoolYear = SchoolYearUtil.getSchoolYear(payment.getPaymentDate());
+
+                    grouped.computeIfAbsent(schoolYear, k -> new ArrayList<>()).add(payment);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return grouped;
     }
 }

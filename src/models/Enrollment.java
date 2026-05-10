@@ -21,8 +21,10 @@ public class Enrollment {
     private boolean sf10Status;
     private boolean goodMoralStatus;
     private int enrollmentStatus;
+    private String paymentScheme;  // ← ADD THIS FIELD
 
     public Enrollment() {
+        this.paymentScheme = "QUARTERLY"; // Default value
     }
 
     public int getEnrollmentId() {
@@ -95,5 +97,14 @@ public class Enrollment {
 
     public void setEnrollmentStatus(int enrollmentStatus) {
         this.enrollmentStatus = enrollmentStatus;
+    }
+
+    // ADD THESE METHODS
+    public String getPaymentScheme() {
+        return paymentScheme;
+    }
+
+    public void setPaymentScheme(String paymentScheme) {
+        this.paymentScheme = paymentScheme;
     }
 }

@@ -10,7 +10,6 @@ package dao;
  */
 import database.DatabaseConnection;
 import models.Enrollment;
-
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -29,9 +28,10 @@ public class EnrollmentDAO {
                 PSA_status,
                 SF10_status,
                 GoodMoral_status,
-                enrollment_status
+                enrollment_status,
+                payment_scheme
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING enrollment_id
         """;
 
@@ -50,6 +50,7 @@ public class EnrollmentDAO {
             stmt.setBoolean(6, enrollment.isSf10Status());
             stmt.setBoolean(7, enrollment.isGoodMoralStatus());
             stmt.setInt(8, enrollment.getEnrollmentStatus());
+            stmt.setString(9, enrollment.getPaymentScheme()); // ← ADD THIS
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -72,15 +73,15 @@ public class EnrollmentDAO {
                 PSA_status,
                 SF10_status,
                 GoodMoral_status,
-                enrollment_status
+                enrollment_status,
+                payment_scheme
             FROM enrollment
             WHERE student_id = ?
             ORDER BY enrollment_id DESC
             LIMIT 1
         """;
 
-        try (
-                Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, studentId);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -104,13 +105,13 @@ public class EnrollmentDAO {
                 PSA_status,
                 SF10_status,
                 GoodMoral_status,
-                enrollment_status
+                enrollment_status,
+                payment_scheme
             FROM enrollment
             WHERE enrollment_id = ?
         """;
 
-        try (
-                Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, enrollmentId);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -140,6 +141,7 @@ public class EnrollmentDAO {
         enrollment.setSf10Status(rs.getBoolean("SF10_status"));
         enrollment.setGoodMoralStatus(rs.getBoolean("GoodMoral_status"));
         enrollment.setEnrollmentStatus(rs.getInt("enrollment_status"));
+        enrollment.setPaymentScheme(rs.getString("payment_scheme")); // ← ADD THIS
 
         return enrollment;
     }
