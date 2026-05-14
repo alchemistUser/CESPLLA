@@ -14,12 +14,12 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Pololoers
  */
-public class SchoolYearManagementView extends javax.swing.JPanel {
+public class SchoolYearManagementViewPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form SchoolYearManagementView
      */
-    public SchoolYearManagementView() {
+    public SchoolYearManagementViewPanel() {
         initComponents();
     }
 

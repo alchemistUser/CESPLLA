@@ -4,19 +4,12 @@
  */
 package controllers;
 
-/**
- *
- * @author Pololoers
- */
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 import dao.EnrollmentDAO;
 import dao.StudentDAO;
 import models.Enrollment;
 import models.Payment;
 import models.Student;
+import services.BillingService;
 import services.PaymentService;
 import utils.DialogUtil;
 import utils.ValidationUtil;
@@ -24,6 +17,7 @@ import views.dialogs.payments.PaymentFormDialog;
 import views.panels.payments.PaymentBillingPanel;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
@@ -34,6 +28,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import models.BillingBreakdownItem;
 
+/**
+ *
+ * @author Pololoers
+ */
 public class PaymentController {
 
     private final PaymentBillingPanel view;
@@ -43,6 +41,8 @@ public class PaymentController {
 
     private Student selectedStudent;
     private Enrollment selectedEnrollment;
+
+    private final BillingService billingService = new BillingService();
 
     public PaymentController(PaymentBillingPanel view) {
         this.view = view;
@@ -63,121 +63,66 @@ public class PaymentController {
         view.getCmbPaymentPlan().addActionListener(e -> handlePaymentPlanChanged());
     }
 
-    // =====================================================
-    // SEARCH STUDENT BY NAME (FIXED)
-    // =====================================================
     private void handleSearchStudentBilling() {
         String keyword = view.getTxtSearchKeyword().getText().trim();
 
         if (ValidationUtil.isEmpty(keyword)) {
-            DialogUtil.showWarning(view, "Please enter a student name.");
+            DialogUtil.showWarning(view, "Please enter student name.");
             return;
         }
 
         try {
-            // 1. Search by Name
-            List<Student> results = studentDAO.searchByName(keyword);
+            // Search by name instead of LRN
+            List<Student> students = studentDAO.searchByName(keyword);
 
-            if (results.isEmpty()) {
+            if (students.isEmpty()) {
                 DialogUtil.showError(view, "No students found matching: " + keyword);
                 return;
             }
 
-            // 2. Select first result (You can expand this to show a selection dialog later)
-            selectedStudent = results.get(0);
-
-            // 3. Find current enrollment for this student
+            selectedStudent = students.get(0);
             selectedEnrollment = enrollmentDAO.findByStudentId(selectedStudent.getStudentId());
 
-            if (selectedEnrollment == null) {
-                DialogUtil.showWarning(view, "Student found but no enrollment record exists.");
-                return;
+            // Display student info - Use correct getter names
+            view.getLblStudentNameValue().setText(
+                    selectedStudent.getFirstName() + " " + selectedStudent.getLastName()
+            );
+            view.getLblGradeLevelValue().setText(selectedStudent.getGradeLevel());
+            view.getLblStudentIdValue().setText(String.valueOf(selectedStudent.getStudentId()));
+
+            if (selectedEnrollment != null) {
+                view.getLblEnrollmentIdValue().setText(String.valueOf(selectedEnrollment.getEnrollmentId()));
+                view.getLblEnrollmentStatusValue().setText(resolveEnrollmentStatus(selectedEnrollment));
+
+                // Sync Payment Plan
+                view.getCmbPaymentPlan().setSelectedItem(selectedEnrollment.getPaymentScheme());
             }
 
-            // 4. Update UI
-            updateStudentDisplay(selectedStudent, selectedEnrollment);
-
-            // 5. Load Data
-            loadBillingInformation();
+            updateBalanceLabels(selectedStudent.getStudentId());
             loadPaymentHistory(selectedStudent.getStudentId());
+
+            view.getBtnRecordPayment().setEnabled(true);
+            view.getBtnGenerateSOA().setEnabled(true);
 
         } catch (Exception ex) {
             DialogUtil.showError(view, "Search failed: " + ex.getMessage());
         }
     }
 
-    // =====================================================
-    // UPDATE DISPLAY HELPERS
-    // =====================================================
-    private void updateStudentDisplay(Student student, Enrollment enrollment) {
-        view.getLblStudentIdValue().setText(String.valueOf(student.getStudentId()));
-        view.getLblStudentNameValue().setText(buildStudentName(student));
-        view.getLblGradeLevelValue().setText(formatGradeLevel(student.getGradeLevel()));
-        view.getLblEnrollmentIdValue().setText(String.valueOf(enrollment.getEnrollmentId()));
-        view.getLblEnrollmentStatusValue().setText(resolveEnrollmentStatus(enrollment));
-
-        // Sync payment plan combo box with enrollment data
-        view.getCmbPaymentPlan().setSelectedItem(enrollment.getPaymentScheme());
-    }
-
-    // =====================================================
-    // LOAD BILLING INFO (FEES & BALANCE)
-    // =====================================================
-    private void loadBillingInformation() {
-        if (selectedStudent == null || selectedEnrollment == null) {
-            return;
-        }
-
-        try {
-            int studentId = selectedStudent.getStudentId();
-            String gradeLevel = selectedEnrollment.getGradeLevel();
-            String paymentPlan = view.getSelectedPaymentPlan();
-
-            // Calculate Totals
-            BigDecimal totalFee = paymentService.getTotalFee(gradeLevel, paymentPlan);
-            BigDecimal totalPaid = paymentService.getTotalPaidByStudentId(studentId);
-            BigDecimal balance = totalFee.subtract(totalPaid);
-
-            // Update Labels
-            view.getLblTotalFeeValue().setText(formatCurrency(totalFee));
-            view.getLblTotalPaidValue().setText(formatCurrency(totalPaid));
-            view.getLblBalanceValue().setText(formatCurrency(balance));
-
-            // Color code balance
-            if (balance.compareTo(BigDecimal.ZERO) > 0) {
-                view.getLblBalanceValue().setForeground(new java.awt.Color(255, 0, 0)); // Red
-            } else {
-                view.getLblBalanceValue().setForeground(new java.awt.Color(0, 128, 0)); // Green
-            }
-
-            // Update Breakdown Table
-            refreshBillingBreakdownTable(gradeLevel, paymentPlan);
-
-            // Enable Action Buttons
-            view.getBtnRecordPayment().setEnabled(true);
-            view.getBtnGenerateSOA().setEnabled(true);
-
-        } catch (Exception ex) {
-            DialogUtil.showError(view, "Failed to load billing info: " + ex.getMessage());
-        }
-    }
-
-    // =====================================================
-    // LOAD PAYMENT HISTORY (MISSING METHOD ADDED)
-    // =====================================================
+    // ✅ ADDED THIS MISSING METHOD
     private void loadPaymentHistory(int studentId) {
         try {
             List<Payment> payments = paymentService.getPaymentHistoryByStudentId(studentId);
 
             DefaultTableModel model = (DefaultTableModel) view.getTblPayments().getModel();
-            model.setRowCount(0); // Clear existing rows
+            model.setRowCount(0);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
             for (Payment payment : payments) {
                 model.addRow(new Object[]{
                     payment.getPaymentId(),
-                    payment.getPaymentDate() != null ? payment.getPaymentDate().format(formatter) : "N/A",
+                    payment.getPaymentDate() != null ? payment.getPaymentDate().format(formatter) : "",
                     formatCurrency(payment.getAmount()),
                     payment.getPaymentMethod(),
                     payment.getPaymentPlan(),
@@ -189,39 +134,76 @@ public class PaymentController {
         }
     }
 
+    private void loadBillingInformation() throws SQLException {
+        int studentId = selectedStudent.getStudentId();
+        String gradeLevel = String.valueOf(selectedEnrollment.getGradeLevel());
+        String paymentPlan = view.getSelectedPaymentPlan();
+
+        BigDecimal totalFee = paymentService.getTotalFee(gradeLevel, paymentPlan);
+        BigDecimal totalPaid = paymentService.getTotalPaidByStudentId(studentId);
+        BigDecimal balance = totalFee.subtract(totalPaid);
+
+        view.getLblTotalFeeValue().setText(formatCurrency(totalFee));
+        view.getLblTotalPaidValue().setText(formatCurrency(totalPaid));
+        view.getLblBalanceValue().setText(formatCurrency(balance));
+
+        refreshBillingBreakdownTable(gradeLevel, paymentPlan);
+        refreshPaymentTable(studentId);
+    }
+
     private void refreshBillingBreakdownTable(String gradeLevel, String paymentPlan) {
         List<BillingBreakdownItem> items = paymentService.getBillingBreakdown(gradeLevel, paymentPlan);
         DefaultTableModel model = (DefaultTableModel) view.getTblBillingBreakdown().getModel();
         model.setRowCount(0);
 
         for (BillingBreakdownItem item : items) {
+            model.addRow(new Object[]{item.getDescription(), formatCurrency(item.getAmount())});
+        }
+    }
+
+    private void refreshPaymentTable(int studentId) throws SQLException {
+        List<Payment> payments = paymentService.getPaymentHistoryByStudentId(studentId);
+        DefaultTableModel model = (DefaultTableModel) view.getTblPayments().getModel();
+        model.setRowCount(0);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        for (Payment payment : payments) {
             model.addRow(new Object[]{
-                item.getDescription(),
-                formatCurrency(item.getAmount())
+                payment.getPaymentId(),
+                payment.getPaymentDate() != null ? payment.getPaymentDate().format(formatter) : "",
+                formatCurrency(payment.getAmount()),
+                payment.getPaymentMethod(),
+                payment.getPaymentPlan(),
+                payment.getReferenceNumber()
             });
         }
     }
 
-    // =====================================================
-    // EVENT HANDLERS
-    // =====================================================
     private void handlePaymentPlanChanged() {
-        if (selectedEnrollment != null) {
-            loadBillingInformation();
+        if (selectedStudent != null && selectedEnrollment != null) {
+            try {
+                loadBillingInformation();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
     private void handleRefresh() {
         if (selectedStudent != null) {
-            loadBillingInformation();
-            loadPaymentHistory(selectedStudent.getStudentId());
+            try {
+                loadBillingInformation();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         } else {
             resetDisplay();
         }
     }
 
     private void handleRecordPayment() {
-        if (selectedStudent == null || selectedEnrollment == null) {
+        if (selectedStudent == null) {
             DialogUtil.showWarning(view, "Please search and select a student first.");
             return;
         }
@@ -234,26 +216,13 @@ public class PaymentController {
 
         dialog.getBtnSavePayment().addActionListener(e -> {
             try {
-                // Use PaymentService to validate and build the payment object
-                Payment payment = paymentService.validateAndBuildPayment(
-                        dialog.getAmountText(),
-                        dialog.getSelectedPaymentMethod(),
-                        dialog.getReferenceNumber(),
-                        view.getSelectedPaymentPlan(),
-                        dialog.getPaymentDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-                        selectedStudent.getStudentId(),
-                        selectedEnrollment.getGradeLevel()
-                );
-
-                // Record Payment
+                Payment payment = buildPayment(dialog);
                 paymentService.recordPayment(payment);
 
                 DialogUtil.showSuccess(dialog, "Payment recorded successfully.");
                 dialog.dispose();
-
-                // Refresh Data
-                loadBillingInformation();
-                loadPaymentHistory(selectedStudent.getStudentId());
+                refreshPaymentTable(selectedStudent.getStudentId());
+                updateBalanceLabels(selectedStudent.getStudentId());
 
             } catch (IllegalArgumentException ex) {
                 DialogUtil.showWarning(dialog, ex.getMessage());
@@ -265,40 +234,97 @@ public class PaymentController {
         dialog.setVisible(true);
     }
 
+    private Payment buildPayment(PaymentFormDialog dialog) {
+        String amountText = dialog.getAmountText();
+        if (amountText.isEmpty()) {
+            throw new IllegalArgumentException("Amount required.");
+        }
+
+        BigDecimal amount = new BigDecimal(amountText);
+        String gradeLevel = selectedEnrollment.getGradeLevel();
+        String paymentPlan = view.getSelectedPaymentPlan();
+
+        // ✅ FIXED: Wrap in try-catch for SQLException
+        BigDecimal balance;
+        try {
+            balance = paymentService.calculateBalance(selectedStudent.getStudentId(), gradeLevel, paymentPlan);
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to calculate balance: " + ex.getMessage());
+        }
+
+        if (amount.compareTo(balance) > 0) {
+            throw new IllegalArgumentException("Payment exceeds balance.");
+        }
+
+        LocalDate paymentDate = dialog.getPaymentDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        Payment payment = new Payment();
+        payment.setStudentId(selectedStudent.getStudentId());
+        payment.setAmount(amount);
+        payment.setPaymentMethod(dialog.getSelectedPaymentMethod());
+        payment.setPaymentPlan(paymentPlan);
+        payment.setReferenceNumber(resolveReferenceNumber(dialog));
+        payment.setPaymentDate(paymentDate);
+
+        return payment;
+    }
+
+    private String resolveReferenceNumber(PaymentFormDialog dialog) {
+        String method = dialog.getSelectedPaymentMethod();
+        String ref = dialog.getReferenceNumber();
+
+        if ("Cash".equals(method)) {
+            return (ref == null || ref.trim().isEmpty()) ? "N/A" : ref.trim();
+        }
+        if (ref == null || ref.trim().isEmpty()) {
+            throw new IllegalArgumentException("Reference number required for " + method);
+        }
+        return ref.trim();
+    }
+
     private void handleGenerateSOA() {
-        javax.swing.JOptionPane.showMessageDialog(
-                view,
-                "Statement of Account generation will be added in the Reports phase.",
-                "Information",
-                javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
+        if (selectedStudent == null) {
+            DialogUtil.showWarning(view, "Please select a student first.");
+            return;
+        }
+        JOptionPane.showMessageDialog(view, "SOA generation will be added in Reports phase.", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void resetDisplay() {
         selectedStudent = null;
         selectedEnrollment = null;
-
         view.getLblStudentIdValue().setText("-");
         view.getLblStudentNameValue().setText("-");
         view.getLblGradeLevelValue().setText("-");
         view.getLblEnrollmentIdValue().setText("-");
         view.getLblEnrollmentStatusValue().setText("-");
-
         view.getLblTotalFeeValue().setText("₱0.00");
         view.getLblTotalPaidValue().setText("₱0.00");
         view.getLblBalanceValue().setText("₱0.00");
-        view.getLblBalanceValue().setForeground(new java.awt.Color(255, 0, 0));
-
         ((DefaultTableModel) view.getTblPayments().getModel()).setRowCount(0);
-        ((DefaultTableModel) view.getTblBillingBreakdown().getModel()).setRowCount(0);
-
         view.getBtnRecordPayment().setEnabled(false);
         view.getBtnGenerateSOA().setEnabled(false);
     }
 
-    // =====================================================
-    // FORMATTERS
-    // =====================================================
+    private void updateBalanceLabels(int studentId) {
+        try {
+            BigDecimal totalFee = billingService.getTotalFee(studentId);
+            BigDecimal totalPaid = billingService.getTotalPaid(studentId);
+            BigDecimal balance = billingService.calculateBalance(studentId);
+
+            // Use correct getter names
+            view.getLblTotalFeeValue().setText(billingService.formatAmount(totalFee));
+            view.getLblTotalPaidValue().setText(billingService.formatAmount(totalPaid));
+            view.getLblBalanceValue().setText(billingService.formatAmount(balance));
+
+            view.getLblBalanceValue().setForeground(
+                    balance.compareTo(BigDecimal.ZERO) > 0 ? new java.awt.Color(255, 0, 0) : new java.awt.Color(0, 128, 0)
+            );
+        } catch (Exception ex) {
+            DialogUtil.showError(view, "Failed to calculate balance: " + ex.getMessage());
+        }
+    }
+
     private String buildStudentName(Student s) {
         return s.getFirstName() + " " + (s.getMiddleName() != null ? s.getMiddleName() + " " : "") + s.getLastName();
     }
@@ -319,24 +345,7 @@ public class PaymentController {
         };
     }
 
-    private String formatGradeLevel(String db) {
-        return switch (db != null ? db.trim() : "") {
-            case "N" ->
-                "Nursery";
-            case "K1" ->
-                "Junior Kindergarten";
-            case "K2" ->
-                "Senior Kindergarten";
-            default ->
-                db;
-        };
-    }
-
     private String formatCurrency(BigDecimal amount) {
-        if (amount == null) {
-            return "₱0.00";
-        }
-        return "₱" + amount.setScale(2, java.math.RoundingMode.HALF_UP);
+        return amount == null ? "₱0.00" : "₱" + amount.setScale(2, java.math.RoundingMode.HALF_UP);
     }
-
 }

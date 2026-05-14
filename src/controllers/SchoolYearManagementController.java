@@ -8,7 +8,7 @@ package controllers;
  *
  * @author Pololoers
  */
-import views.maintenance.SchoolYearManagementView;
+import views.maintenance.SchoolYearManagementViewPanel;
 import services.SchoolYearService; // Requires Step 4
 import utils.DialogUtil;
 
@@ -18,10 +18,10 @@ import java.util.Map;
 
 public class SchoolYearManagementController {
 
-    private final SchoolYearManagementView view;
+    private final SchoolYearManagementViewPanel view;
     private final SchoolYearService service;
 
-    public SchoolYearManagementController(SchoolYearManagementView view) {
+    public SchoolYearManagementController(SchoolYearManagementViewPanel view) {
         this.view = view;
         this.service = new SchoolYearService(); // Service created in next step
         attachEvents();

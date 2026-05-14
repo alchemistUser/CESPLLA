@@ -4,17 +4,17 @@
  */
 package services;
 
-/**
- *
- * @author Pololoers
- */
-import dao.PaymentDAO;
 import dao.EnrollmentDAO;
+import dao.PaymentDAO;
 import models.Enrollment;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 
+/**
+ *
+ * @author Pololoers
+ */
 public class BillingService {
 
     private final PaymentDAO paymentDAO;
@@ -26,11 +26,9 @@ public class BillingService {
     }
 
     /**
-     * Gets total fee for a student based on grade level. NOTE: Replace with
-     * FeeScheduleDAO when Phase 9 is implemented.
+     * Gets total fee for a student based on grade level.
      */
     public BigDecimal getTotalFee(int studentId) throws SQLException {
-        // Get student's current enrollment to determine grade level
         Enrollment enrollment = enrollmentDAO.findByStudentId(studentId);
 
         if (enrollment == null) {
@@ -86,8 +84,7 @@ public class BillingService {
     }
 
     /**
-     * Helper method to get fee based on grade level. TODO: Replace with
-     * FeeScheduleDAO lookup
+     * Helper method to get fee based on grade level.
      */
     private BigDecimal getFeeForGradeLevel(String gradeLevel) {
         if (gradeLevel == null) {
@@ -115,5 +112,4 @@ public class BillingService {
         }
         return "₱ " + amount.setScale(2, RoundingMode.HALF_UP).toString();
     }
-
 }

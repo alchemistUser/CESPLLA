@@ -4,10 +4,6 @@
  */
 package dao;
 
-/**
- *
- * @author Pololoers
- */
 import database.DatabaseConnection;
 import models.Enrollment;
 import java.sql.Connection;
@@ -16,6 +12,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ *
+ * @author Pololoers
+ */
 public class EnrollmentDAO {
 
     public int createEnrollment(Connection conn, Enrollment enrollment) throws SQLException {
@@ -25,15 +25,15 @@ public class EnrollmentDAO {
                 grade_level,
                 diagnostic_test_schedule,
                 diagnostic_test_status,
-                PSA_status,
-                SF10_status,
-                GoodMoral_status,
+                psa_status,
+                sf10_status,
+                goodmoral_status,
                 enrollment_status,
                 payment_scheme
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING enrollment_id
-        """;
+            """;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, enrollment.getStudentId());
@@ -50,7 +50,7 @@ public class EnrollmentDAO {
             stmt.setBoolean(6, enrollment.isSf10Status());
             stmt.setBoolean(7, enrollment.isGoodMoralStatus());
             stmt.setInt(8, enrollment.getEnrollmentStatus());
-            stmt.setString(9, enrollment.getPaymentScheme()); // ← ADD THIS
+            stmt.setString(9, enrollment.getPaymentScheme()); // ← ADDED
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -70,16 +70,16 @@ public class EnrollmentDAO {
                 grade_level,
                 diagnostic_test_schedule,
                 diagnostic_test_status,
-                PSA_status,
-                SF10_status,
-                GoodMoral_status,
+                psa_status,
+                sf10_status,
+                goodmoral_status,
                 enrollment_status,
                 payment_scheme
             FROM enrollment
             WHERE student_id = ?
             ORDER BY enrollment_id DESC
             LIMIT 1
-        """;
+            """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, studentId);
@@ -102,14 +102,14 @@ public class EnrollmentDAO {
                 grade_level,
                 diagnostic_test_schedule,
                 diagnostic_test_status,
-                PSA_status,
-                SF10_status,
-                GoodMoral_status,
+                psa_status,
+                sf10_status,
+                goodmoral_status,
                 enrollment_status,
                 payment_scheme
             FROM enrollment
             WHERE enrollment_id = ?
-        """;
+            """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, enrollmentId);
@@ -137,11 +137,11 @@ public class EnrollmentDAO {
         }
 
         enrollment.setDiagnosticTestStatus(rs.getBoolean("diagnostic_test_status"));
-        enrollment.setPsaStatus(rs.getBoolean("PSA_status"));
-        enrollment.setSf10Status(rs.getBoolean("SF10_status"));
-        enrollment.setGoodMoralStatus(rs.getBoolean("GoodMoral_status"));
+        enrollment.setPsaStatus(rs.getBoolean("psa_status"));
+        enrollment.setSf10Status(rs.getBoolean("sf10_status"));
+        enrollment.setGoodMoralStatus(rs.getBoolean("goodmoral_status"));
         enrollment.setEnrollmentStatus(rs.getInt("enrollment_status"));
-        enrollment.setPaymentScheme(rs.getString("payment_scheme")); // ← ADD THIS
+        enrollment.setPaymentScheme(rs.getString("payment_scheme")); // ← ADDED
 
         return enrollment;
     }

@@ -4,12 +4,12 @@
  */
 package models;
 
+import java.time.LocalDate;
+
 /**
  *
  * @author Pololoers
  */
-import java.time.LocalDate;
-
 public class Enrollment {
 
     private int enrollmentId;
@@ -21,10 +21,10 @@ public class Enrollment {
     private boolean sf10Status;
     private boolean goodMoralStatus;
     private int enrollmentStatus;
-    private String paymentScheme;  // ← ADD THIS FIELD
+    private String paymentScheme; // ← ADDED
 
     public Enrollment() {
-        this.paymentScheme = "QUARTERLY"; // Default value
+        this.paymentScheme = "QUARTERLY"; // Default
     }
 
     public int getEnrollmentId() {
@@ -99,7 +99,7 @@ public class Enrollment {
         this.enrollmentStatus = enrollmentStatus;
     }
 
-    // ADD THESE METHODS
+    // ADDED GETTER/SETTER
     public String getPaymentScheme() {
         return paymentScheme;
     }

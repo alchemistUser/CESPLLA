@@ -14,7 +14,8 @@ import views.dashboards.AdminDashboardView;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import views.maintenance.SchoolYearManagementView;
+import views.maintenance.ClassScheduleManagementPanel;
+import views.maintenance.SchoolYearManagementViewPanel;
 
 import views.panels.users.AccountRegistrationPanel;
 import views.panels.students.SearchStudentPanel;
@@ -23,7 +24,7 @@ import views.panels.enrollment.NewStudentEnrollmentPanel;
 import views.panels.payments.PaymentBillingPanel;
 import views.panels.reports.ReportsView;
 import views.panels.enrollment.EnrollmentMenuPanel;
-import views.maintenance.SchoolYearManagementView;
+import views.maintenance.SchoolYearManagementViewPanel;
 
 public class AdminDashboardController {
 
@@ -63,13 +64,12 @@ public class AdminDashboardController {
             loadPanel(panel);
         });
 
-        adminDashboardView.getBtnClassSchedule().addActionListener(e
-                -> JOptionPane.showMessageDialog(
-                        adminDashboardView,
-                        "Class Schedule module will be added later."
-                )
-        );
-
+        adminDashboardView.getBtnClassSchedule().addActionListener(e -> {
+            ClassScheduleManagementPanel panel = new ClassScheduleManagementPanel();
+            new ClassScheduleController(panel);
+            loadPanel(panel);
+        });
+        
         adminDashboardView.getBtnReports().addActionListener(e -> {
             ReportsView panel = new ReportsView();
             new ReportsController(panel);
@@ -100,7 +100,7 @@ public class AdminDashboardController {
         adminDashboardView.getBtnLogout().addActionListener(e -> handleLogout());
 
         adminDashboardView.getBtnSchoolYearManagement().addActionListener(e -> {
-            SchoolYearManagementView panel = new SchoolYearManagementView();
+            SchoolYearManagementViewPanel panel = new SchoolYearManagementViewPanel();
             new SchoolYearManagementController(panel);
             loadPanel(panel);
         });
