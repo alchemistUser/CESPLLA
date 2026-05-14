@@ -8,10 +8,6 @@ package controllers;
  *
  * @author Pololoers
  */
-import models.ClassModel;
-import models.Section;
-import models.Subject;
-import models.Teacher;
 import services.ClassScheduleService;
 import utils.DialogUtil;
 import views.dialogs.classschedule.ClassFormDialog;
@@ -21,6 +17,19 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Frame;
 
 import java.util.List;
+import javax.swing.JOptionPane;
+import models.ScheduleGenerationService;
+
+import dao.ClassDAO;
+import dao.ScheduleDAO;
+import dao.SectionDAO;
+import dao.SubjectDAO;
+import dao.TeacherDAO;
+import models.ClassModel;
+import models.ScheduleModel;
+import models.Section;
+import models.Subject;
+import models.Teacher;
 
 public class ClassScheduleController {
 
@@ -28,10 +37,27 @@ public class ClassScheduleController {
     private final ClassScheduleService service;
 
     private List<ClassModel> allClasses;
+    private List<Section> sections;          // ← ADD THIS
+    private List<Subject> subjects;          // ← ADD THIS  
+    private List<Teacher> teachers;          // ← ADD THIS
+    private List<ScheduleModel> schedules;   // ← ADD THIS
+
+    private final ClassDAO classDAO;
+    private final SectionDAO sectionDAO;
+    private final SubjectDAO subjectDAO;
+    private final TeacherDAO teacherDAO;
+    private final ScheduleDAO scheduleDAO;
 
     public ClassScheduleController(ClassScheduleManagementPanel view) {
         this.view = view;
         this.service = new ClassScheduleService();
+
+        this.classDAO = new ClassDAO();
+        this.sectionDAO = new SectionDAO();
+        this.subjectDAO = new SubjectDAO();
+        this.teacherDAO = new TeacherDAO();
+        this.scheduleDAO = new ScheduleDAO();
+
         initializeComponents();
         loadData();
         attachEvents();
@@ -44,10 +70,15 @@ public class ClassScheduleController {
 
     private void loadData() {
         try {
-            allClasses = service.getAllClassesWithDetails();
+            sections = sectionDAO.findAll();           // ← ADD THIS
+            subjects = subjectDAO.findAll();           // ← ADD THIS
+            teachers = teacherDAO.findAll();           // ← ADD THIS
+            schedules = scheduleDAO.findAll();         // ← ADD THIS
+            allClasses = classDAO.findAllWithDetails();
+
             refreshTable();
         } catch (Exception ex) {
-            DialogUtil.showError(view, "Failed to load schedule data: " + ex.getMessage());
+            DialogUtil.showError(view, "Failed to load class schedule data: " + ex.getMessage());
         }
     }
 
@@ -123,16 +154,23 @@ public class ClassScheduleController {
 
     private void populateDialogDropdowns(ClassFormDialog dialog) {
         dialog.getCmbSection().removeAllItems();
-        service.getAllSections().forEach(dialog.getCmbSection()::addItem);
+        for (Section s : sections) {                    // ← Now works
+            dialog.getCmbSection().addItem(s);
+        }
 
         dialog.getCmbSubject().removeAllItems();
-        service.getAllSubjects().forEach(dialog.getCmbSubject()::addItem);
+        for (Subject s : subjects) {                    // ← Now works
+            dialog.getCmbSubject().addItem(s);
+        }
 
         dialog.getCmbTeacher().removeAllItems();
-        service.getAllTeachers().forEach(dialog.getCmbTeacher()::addItem);
+        for (Teacher t : teachers) {                    // ← Now works
+            dialog.getCmbTeacher().addItem(t);
+        }
 
         dialog.getCmbDay().removeAllItems();
-        for (String d : new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"}) {
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+        for (String d : days) {
             dialog.getCmbDay().addItem(d);
         }
     }
@@ -201,6 +239,48 @@ public class ClassScheduleController {
             } catch (Exception ex) {
                 DialogUtil.showError(view, "Failed: " + ex.getMessage());
             }
+        }
+    }
+
+    private void handleAutoGenerate() {
+        // 1. Check if sections are available
+        if (sections == null || sections.isEmpty()) {
+            DialogUtil.showError(view, "No sections available. Please create a section first.");
+            return;
+        }
+
+        // 2. Prompt user to select a section
+        Section selectedSection = (Section) JOptionPane.showInputDialog(
+                view,
+                "Select a section to auto-generate schedule:",
+                "Auto-Generate Schedule",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                sections.toArray(),
+                sections.get(0)
+        );
+
+        // 3. Handle user cancellation
+        if (selectedSection == null) {
+            return; // User clicked Cancel
+        }
+
+        try {
+            // 4. Call Service to generate schedule
+            ScheduleGenerationService genService = new ScheduleGenerationService();
+            List<ClassModel> created = genService.generateSchedule(selectedSection.getSectionId());
+
+            // 5. Provide feedback
+            if (created.isEmpty()) {
+                DialogUtil.showWarning(view, "Could not generate schedule. Check if subjects and teachers are available.");
+            } else {
+                DialogUtil.showSuccess(view, "Successfully auto-generated " + created.size() + " classes!");
+                loadData(); // Refresh table
+            }
+
+        } catch (Exception ex) {
+            DialogUtil.showError(view, "Auto-generation failed: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }

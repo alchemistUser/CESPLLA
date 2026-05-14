@@ -15,6 +15,7 @@ import views.dashboards.AdminDashboardView;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import views.maintenance.ClassScheduleManagementPanel;
+import views.maintenance.MaintenanceView;
 import views.maintenance.SchoolYearManagementViewPanel;
 
 import views.panels.users.AccountRegistrationPanel;
@@ -69,20 +70,19 @@ public class AdminDashboardController {
             new ClassScheduleController(panel);
             loadPanel(panel);
         });
-        
+
         adminDashboardView.getBtnReports().addActionListener(e -> {
             ReportsView panel = new ReportsView();
             new ReportsController(panel);
             loadPanel(panel);
         });
 
-        adminDashboardView.getBtnMaintenance().addActionListener(e
-                -> JOptionPane.showMessageDialog(
-                        adminDashboardView,
-                        "Maintenance module will be added later."
-                )
-        );
-
+        adminDashboardView.getBtnMaintenance().addActionListener(e -> {
+            MaintenanceView panel = new MaintenanceView();
+            new MaintenanceController(panel);
+            loadPanel(panel);
+        });
+        
         adminDashboardView.getBtnHelp().addActionListener(e
                 -> JOptionPane.showMessageDialog(
                         adminDashboardView,

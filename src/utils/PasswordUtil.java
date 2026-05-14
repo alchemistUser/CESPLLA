@@ -8,6 +8,8 @@ package utils;
  *
  * @author Pololoers
  */
+import java.awt.Component;
+import javax.swing.JOptionPane;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordUtil {
@@ -27,4 +29,7 @@ public class PasswordUtil {
         return BCrypt.checkpw(plainPassword, hashedPassword);
     }
 
+    public static void showInfo(Component parent, String message) {
+        JOptionPane.showMessageDialog(parent, message, "Information", JOptionPane.INFORMATION_MESSAGE);
+    }
 }
