@@ -22,47 +22,31 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="95" pref="95" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="btnNewStudentEnrollment" max="32767" attributes="0"/>
-                  <Component id="lblSubtitle" alignment="0" max="32767" attributes="0"/>
-                  <Component id="lblTitle" alignment="0" max="32767" attributes="0"/>
-                  <Component id="btnOldStudentEnrollment" max="32767" attributes="0"/>
-                  <Component id="btnEditStudentInformation" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="336" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="btnOldStudentEnrollment" min="-2" pref="450" max="-2" attributes="0"/>
+                  <Component id="btnEditStudentInformation" min="-2" pref="450" max="-2" attributes="0"/>
+                  <Component id="btnNewStudentEnrollment" min="-2" pref="450" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="866" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="394" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="86" max="-2" attributes="0"/>
-              <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblSubtitle" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnNewStudentEnrollment" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnOldStudentEnrollment" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnEditStudentInformation" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="497" max="32767" attributes="0"/>
+          <Group type="102" attributes="0">
+              <EmptySpace min="-2" pref="99" max="-2" attributes="0"/>
+              <Component id="btnNewStudentEnrollment" min="-2" pref="75" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="btnOldStudentEnrollment" min="-2" pref="70" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="btnEditStudentInformation" min="-2" pref="70" max="-2" attributes="0"/>
+              <EmptySpace pref="370" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="lblTitle">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Title"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblSubtitle">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Subtitle"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JButton" name="btnNewStudentEnrollment">
       <Properties>
         <Property name="text" type="java.lang.String" value="New Student Enrollment"/>

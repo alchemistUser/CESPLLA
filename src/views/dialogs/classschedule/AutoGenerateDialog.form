@@ -33,7 +33,7 @@
                   <Component id="btnGenerate" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="btnCancel" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="317" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="317" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -52,16 +52,13 @@
               <Component id="btnGenerate" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="552" max="32767" attributes="0"/>
+              <EmptySpace pref="568" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lblTitle">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Title"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblSection">
       <Properties>

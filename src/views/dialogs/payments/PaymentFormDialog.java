@@ -54,7 +54,7 @@ public class PaymentFormDialog extends javax.swing.JDialog {
 
         cmbPaymentMethod.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Cash", "GCash", "Bank Transfer", "Check" }));
 
-        txtReferenceNumber.setText("reference number");
+        txtReferenceNumber.setText("Reference Number");
         txtReferenceNumber.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtReferenceNumberActionPerformed(evt);
@@ -88,7 +88,7 @@ public class PaymentFormDialog extends javax.swing.JDialog {
                     .addComponent(txtAmount)
                     .addComponent(btnSavePayment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(434, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -107,7 +107,7 @@ public class PaymentFormDialog extends javax.swing.JDialog {
                 .addComponent(btnSavePayment)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCancel)
-                .addContainerGap(164, Short.MAX_VALUE))
+                .addContainerGap(83, Short.MAX_VALUE))
         );
 
         pack();

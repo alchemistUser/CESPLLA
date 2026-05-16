@@ -22,20 +22,30 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lblTitle" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblBackupSection" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblRestoreSection" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblArchiveSection" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnCreateBackup" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnRestoreBackup" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnArchiveRecords" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblLastBackup" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblStatus" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="progressBar" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblTitle" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="456" max="-2" attributes="0"/>
+                              <Component id="lblStatus" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
+                              <Component id="progressBar" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="362" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="btnRestoreBackup" min="-2" pref="400" max="-2" attributes="0"/>
+                          <Component id="btnCreateBackup" min="-2" pref="400" max="-2" attributes="0"/>
+                          <Component id="btnArchiveRecords" alignment="0" min="-2" pref="400" max="-2" attributes="0"/>
+                          <Component id="lblLastBackup" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
-              <EmptySpace pref="969" max="32767" attributes="0"/>
+              <EmptySpace pref="516" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -44,54 +54,34 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblBackupSection" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblRestoreSection" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblArchiveSection" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnCreateBackup" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnRestoreBackup" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnArchiveRecords" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="89" max="-2" attributes="0"/>
+              <Component id="btnCreateBackup" min="-2" pref="75" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="btnRestoreBackup" min="-2" pref="75" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="btnArchiveRecords" min="-2" pref="75" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="lblLastBackup" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblStatus" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="progressBar" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="479" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="progressBar" max="32767" attributes="0"/>
+                  <Component id="lblStatus" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace pref="275" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lblTitle">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Title"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblBackupSection">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Backup Section"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblRestoreSection">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Restore Section"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblArchiveSection">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Archive Section"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnCreateBackup">
       <Properties>
         <Property name="text" type="java.lang.String" value="Create Backup"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCreateBackupActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnRestoreBackup">
       <Properties>

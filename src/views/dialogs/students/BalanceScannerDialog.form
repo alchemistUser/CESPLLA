@@ -65,9 +65,6 @@
   </Layout>
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lblTitle">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Title"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblStudentName">
       <Properties>

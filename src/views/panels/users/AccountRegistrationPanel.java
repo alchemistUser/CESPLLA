@@ -45,11 +45,10 @@ public class AccountRegistrationPanel extends javax.swing.JPanel {
 
         setBackground(new java.awt.Color(255, 255, 255));
 
-        lblTitle.setText("Title");
+        lblTitle.setEnabled(false);
 
         lblName.setText("Name");
 
-        txtName.setText("Name");
         txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
@@ -58,7 +57,6 @@ public class AccountRegistrationPanel extends javax.swing.JPanel {
 
         lblEmail.setText("Email");
 
-        txtEmail.setText("Email");
         txtEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtEmailActionPerformed(evt);
@@ -77,7 +75,7 @@ public class AccountRegistrationPanel extends javax.swing.JPanel {
 
         lblRole.setText("Role");
 
-        cmbRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Admin", "Registrar", "Teacher" }));
+        cmbRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Registrar", "Teacher" }));
 
         btnRegister.setText("Register");
         btnRegister.addActionListener(new java.awt.event.ActionListener() {
@@ -100,7 +98,7 @@ public class AccountRegistrationPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(455, 455, 455)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lblTitle)
                     .addComponent(lblName)
@@ -113,15 +111,15 @@ public class AccountRegistrationPanel extends javax.swing.JPanel {
                     .addComponent(txtEmail)
                     .addComponent(txtPassword)
                     .addComponent(txtConfirmPassword)
-                    .addComponent(cmbRole, 0, 162, Short.MAX_VALUE)
+                    .addComponent(cmbRole, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnRegister, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(953, Short.MAX_VALUE))
+                    .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(504, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(123, 123, 123)
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblName)
@@ -149,7 +147,7 @@ public class AccountRegistrationPanel extends javax.swing.JPanel {
                 .addComponent(btnClear)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblMessage)
-                .addContainerGap(356, Short.MAX_VALUE))
+                .addContainerGap(255, Short.MAX_VALUE))
         );
 
         getAccessibleContext().setAccessibleName("panelMain");

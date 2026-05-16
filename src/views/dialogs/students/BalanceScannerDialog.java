@@ -45,8 +45,6 @@ public class BalanceScannerDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        lblTitle.setText("Title");
-
         lblStudentName.setText("Student Name");
 
         lblSchoolYear.setText("School Year");
